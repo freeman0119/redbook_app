@@ -1,34 +1,36 @@
 import {request} from '../utils/request';
-import Loading from '../components/widget/Loading';
-import {flow} from 'mobx';
+import {action, flow, observable} from 'mobx';
 import {save} from '../utils/Storage';
-class UserStore {
-  userInfo: any;
+import Loading from '../components/widget/Loading';
 
-  // requestLogin = async (
-  //   phone: string,
-  //   pwd: string,
-  //   callback: (success: boolean) => void,
-  // ) => {
-  //   try {
-  //     const params = {
-  //       name: phone,
-  //       pwd: pwd,
-  //     };
-  //     const {data} = await request('login', params);
-  //     if (data) {
-  //       this.userInfo = data;
-  //       callback?.(true);
-  //     } else {
-  //       this.userInfo = null;
-  //       callback?.(false);
+class UserStore {
+  @observable userInfo: any;
+
+  // requestLogin = async (phone: string, pwd: string, callback: (success: boolean) => void) => {
+  //     try {
+  //         const params = {
+  //             name: phone,
+  //             pwd: pwd,
+  //         };
+  //         const { data } = await request('login', params);
+  //         if (data) {
+  //             this.userInfo = data;
+  //             callback?.(true);
+  //         } else {
+  //             this.userInfo = null;
+  //             callback?.(false);
+  //         }
+  //     } catch (error) {
+  //         console.log(error);
+  //         this.userInfo = null;
+  //         callback?.(false);
   //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //     this.userInfo = null;
-  //     callback?.(false);
-  //   }
   // };
+
+  @action
+  setUserInfo = (info: any) => {
+    this.userInfo = info;
+  };
 
   requestLogin = flow(function* (
     this: UserStore,
@@ -43,17 +45,16 @@ class UserStore {
         pwd: pwd,
       };
       const {data} = yield request('login', params);
-      console.log(data);
       if (data) {
-        this.userInfo = data;
         save('userInfo', JSON.stringify(data));
+        this.userInfo = data;
         callback?.(true);
       } else {
         this.userInfo = null;
         callback?.(false);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.log(error);
       this.userInfo = null;
       callback?.(false);
     } finally {
@@ -62,4 +63,5 @@ class UserStore {
   });
 }
 
+// ESM单例导出
 export default new UserStore();

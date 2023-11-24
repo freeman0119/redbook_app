@@ -6,6 +6,8 @@ import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
 import Welcome from './src/pages/welcome/Welcome';
 import Login from './src/pages/login/Login';
 import MainTab from './src/pages/mainTab/MainTab';
+import ArticleDetail from './src/pages/ArticleDetail/ArticleDetail';
+import SearchGoods from './src/pages/searchGoods/SearchGoods';
 const Stack = createStackNavigator();
 
 function App(): JSX.Element {
@@ -39,6 +41,22 @@ function App(): JSX.Element {
             options={{
               headerShown: false,
               ...TransitionPresets.ModalSlideFromBottomIOS,
+            }}
+          />
+          <Stack.Screen
+            name="ArticleDetail"
+            component={ArticleDetail}
+            options={{
+              headerShown: false,
+              ...TransitionPresets.ModalSlideFromBottomIOS,
+            }}
+          />
+          <Stack.Screen
+            name="SearchGoods"
+            component={SearchGoods}
+            options={{
+              headerShown: false,
+              presentation: 'transparentModal',
             }}
           />
         </Stack.Navigator>

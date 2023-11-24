@@ -1,5 +1,12 @@
-import React, {useEffect} from 'react';
-import {View, Image, Text, StyleSheet, Dimensions} from 'react-native';
+import React, {useEffect, useCallback} from 'react';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 import {useLocalStore} from 'mobx-react';
 import {observer} from 'mobx-react';
 import FlowList from '../../components/flowlist/FlowList.js';
@@ -8,35 +15,17 @@ import Heart from '../../components/Heart';
 import TitleBar from './components/TitleBar';
 import HomeStore from '../../store/HomeStore';
 import CategoryList from './components/CategoryList';
-
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 const {width: SCREENWIDTH} = Dimensions.get('window');
-
-const renderItem = ({item, index}: {item: ArticleSimple; index: number}) => {
-  return (
-    <View style={styles.item} key={index}>
-      <ResizeImage uri={item.image} />
-      <Text style={styles.titleTxt}>{item.title}</Text>
-      <View style={styles.nameLayout}>
-        <Image style={styles.avatarImg} source={{uri: item.avatarUrl}} />
-        <Text style={styles.nameTxt}>{item.userName}</Text>
-        {/* <Image style={styles.heart} source={icon_heart_empty} /> */}
-        <Heart
-          value={item.isFavorite}
-          onValueChanged={(value: boolean) => {
-            console.log(value);
-          }}
-        />
-        <Text style={styles.countTxt}>{item.favoriteCount}</Text>
-      </View>
-    </View>
-  );
-};
 
 const Footer = () => {
   return <Text style={styles.footerTxt}>没有更多数据</Text>;
 };
 
 export default observer(() => {
+  const navigation = useNavigation<StackNavigationProp<any>>();
+
   const store = useLocalStore(() => new HomeStore());
 
   useEffect(() => {
@@ -55,6 +44,38 @@ export default observer(() => {
   };
 
   const categoryList = store.categoryList.filter(i => i.isAdd);
+
+  const onArticlePress = useCallback(
+    (article: ArticleSimple) => () => {
+      navigation.push('ArticleDetail', {id: article.id});
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const renderItem = ({item, index}: {item: ArticleSimple; index: number}) => {
+    return (
+      <TouchableOpacity
+        style={styles.item}
+        key={index}
+        onPress={onArticlePress(item)}>
+        <ResizeImage uri={item.image} />
+        <Text style={styles.titleTxt}>{item.title}</Text>
+        <View style={styles.nameLayout}>
+          <Image style={styles.avatarImg} source={{uri: item.avatarUrl}} />
+          <Text style={styles.nameTxt}>{item.userName}</Text>
+          {/* <Image style={styles.heart} source={icon_heart_empty} /> */}
+          <Heart
+            value={item.isFavorite}
+            onValueChanged={(value: boolean) => {
+              console.log(value);
+            }}
+          />
+          <Text style={styles.countTxt}>{item.favoriteCount}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.root}>
