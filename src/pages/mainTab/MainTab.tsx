@@ -6,9 +6,10 @@ import Shop from '../shop/Shop';
 import Message from '../message/Message';
 import Mine from '../mine/Mine';
 import {
-  ImageLibraryOptions,
+  ImagePickerResponse,
   launchImageLibrary,
 } from 'react-native-image-picker';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 // import icon_tab_home_normal from '../../assets/icon_tab_home_normal.png';
 // import icon_tab_home_selected from '../../assets/icon_tab_home_selected.png';
@@ -25,64 +26,68 @@ const BottomTab = createBottomTabNavigator();
 const RedBookTabBar = ({state, descriptors, navigation}: any) => {
   const {routes, index} = state;
   return (
-    <View style={styles.tabBarContainer}>
-      {routes.map((route: any, i: number) => {
-        const {options} = descriptors[route.key];
-        const {title} = options;
-        const isFocus = index === i;
-        if (i === 2) {
+    <SafeAreaView edges={['bottom']} style={{backgroundColor: 'white'}}>
+      <View style={styles.tabBarContainer}>
+        {routes.map((route: any, i: number) => {
+          const {options} = descriptors[route.key];
+          const {title} = options;
+          const isFocus = index === i;
+          if (i === 2) {
+            return (
+              <TouchableOpacity
+                key={title}
+                style={styles.tabItem}
+                onPress={() => {
+                  launchImageLibrary(
+                    {
+                      mediaType: 'photo',
+                      quality: 1,
+                      includeBase64: true,
+                    },
+                    (res: ImagePickerResponse) => {
+                      const {assets} = res;
+                      if (!assets?.length) {
+                        console.log('选择图片失败');
+                        return;
+                      }
+                      const {uri, height, width, fileName, fileSize, type} =
+                        assets[0];
+                      console.log(
+                        `uri=${uri}, width=${width}, height=${height}`,
+                      );
+                      console.log(
+                        `fileName=${fileName}, fileSize=${fileSize}, type=${type}`,
+                      );
+                    },
+                  );
+                }}>
+                <Image
+                  style={styles.icon_tab_publish}
+                  source={icon_tab_publish}
+                />
+              </TouchableOpacity>
+            );
+          }
           return (
             <TouchableOpacity
-              key={title}
               style={styles.tabItem}
+              key={title}
               onPress={() => {
-                launchImageLibrary(
-                  {
-                    mediaType: 'photo',
-                    quality: 1,
-                    includeBase64: true,
-                  },
-                  (res: ImageLibraryOptions) => {
-                    const {assets} = res;
-                    if (!assets?.length) {
-                      console.log('选择图片失败');
-                      return;
-                    }
-                    const {uri, height, width, fileName, fileSize, type} =
-                      assets[0];
-                    console.log(`uri=${uri}, width=${width}, height=${height}`);
-                    console.log(
-                      `fileName=${fileName}, fileSize=${fileSize}, type=${type}`,
-                    );
-                  },
-                );
+                navigation.navigate(route.name);
               }}>
-              <Image
-                style={styles.icon_tab_publish}
-                source={icon_tab_publish}
-              />
+              <Text
+                style={{
+                  fontSize: isFocus ? 18 : 16,
+                  color: isFocus ? '#333' : '#999',
+                  fontWeight: isFocus ? 'bold' : 'normal',
+                }}>
+                {title}
+              </Text>
             </TouchableOpacity>
           );
-        }
-        return (
-          <TouchableOpacity
-            style={styles.tabItem}
-            key={title}
-            onPress={() => {
-              navigation.navigate(route.name);
-            }}>
-            <Text
-              style={{
-                fontSize: isFocus ? 18 : 16,
-                color: isFocus ? '#333' : '#999',
-                fontWeight: isFocus ? 'bold' : 'normal',
-              }}>
-              {title}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+        })}
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -121,27 +126,27 @@ export default () => {
         <BottomTab.Screen
           name="Home"
           component={Home}
-          options={{title: '首页'}}
+          options={{title: '首页', headerShown: false}}
         />
         <BottomTab.Screen
           name="Shop"
           component={Shop}
-          options={{title: '购物'}}
+          options={{title: '购物', headerShown: false}}
         />
         <BottomTab.Screen
           name="Publish"
           component={Shop}
-          options={{title: '发布'}}
+          options={{title: '发布', headerShown: false}}
         />
         <BottomTab.Screen
           name="Message"
           component={Message}
-          options={{title: '消息'}}
+          options={{title: '消息', headerShown: false}}
         />
         <BottomTab.Screen
           name="Mine"
           component={Mine}
-          options={{title: '我'}}
+          options={{title: '我', headerShown: false}}
         />
       </BottomTab.Navigator>
     </View>
